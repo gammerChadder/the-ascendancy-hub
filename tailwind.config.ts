@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,20 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Custom colors for our productivity tracker
+				brand: {
+					50: "#eef2ff",
+					100: "#d8e0ff",
+					200: "#c5cfff",
+					300: "#a5b4fe",
+					400: "#818cf8",
+					500: "#6366f1",
+					600: "#4f46e5",
+					700: "#4338ca",
+					800: "#3730a3",
+					900: "#312e81",
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -89,6 +103,9 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 			}
 		}
 	},
