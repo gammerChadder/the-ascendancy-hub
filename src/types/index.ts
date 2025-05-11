@@ -44,6 +44,7 @@ export interface InternshipUpdate {
   description: string;
   date: string;
   tags: string[];
+  completed?: boolean;
 }
 
 export interface ContentIdea {

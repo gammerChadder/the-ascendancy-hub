@@ -8,7 +8,8 @@ import {
   Briefcase,
   Trash2,
   Plus,
-  CheckSquare
+  CheckSquare,
+  CheckCircle2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,7 +24,8 @@ const InternshipSection: React.FC = () => {
     updateInternshipTask, 
     deleteInternshipTask,
     addInternshipUpdate,
-    deleteInternshipUpdate 
+    deleteInternshipUpdate,
+    updateInternshipUpdate
   } = useTracker();
   
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -45,6 +47,7 @@ const InternshipSection: React.FC = () => {
       description: formData.description,
       date: formData.date || new Date().toISOString(),
       tags,
+      completed: false,
     });
   };
 
@@ -52,15 +55,19 @@ const InternshipSection: React.FC = () => {
     updateInternshipTask(id, { completed: !currentStatus });
   };
 
+  const toggleUpdateCompletion = (id: string, currentStatus: boolean) => {
+    updateInternshipUpdate(id, { completed: !currentStatus });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Internship</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Internship</h2>
       </div>
 
       <Tabs defaultValue="updates" className="w-full">
         <div className="flex justify-between items-center mb-2">
-          <TabsList>
+          <TabsList className="dark:bg-gray-800">
             <TabsTrigger value="updates" className="flex items-center">
               <Briefcase className="mr-2 h-4 w-4" />
               Updates
@@ -114,27 +121,51 @@ const InternshipSection: React.FC = () => {
                 <Briefcase className="mr-2 h-5 w-5 text-brand-500" />
                 Internship Updates
               </CardTitle>
-              <p className="text-sm text-gray-500">Track your progress and accomplishments</p>
+              <p className="text-sm text-gray-500 dark:text-gray-300">Track your progress and accomplishments</p>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px] pr-4">
                 {data.internship.updates.length > 0 ? (
                   <div className="space-y-4">
                     {data.internship.updates.map((update) => (
-                      <div key={update.id} className="border border-gray-100 rounded-md p-4 relative">
+                      <div 
+                        key={update.id} 
+                        className={`border border-gray-100 dark:border-gray-700 rounded-md p-4 relative ${
+                          update.completed ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-white dark:bg-gray-800'
+                        }`}
+                      >
                         <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium text-gray-800">{update.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{update.description}</p>
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {update.tags.map((tag, idx) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                            <div className="text-xs text-gray-400 mt-2">
-                              {format(new Date(update.date), "PPP")}
+                          <div className="flex items-start space-x-3">
+                            <Checkbox 
+                              checked={update.completed} 
+                              onCheckedChange={() => toggleUpdateCompletion(update.id, update.completed || false)}
+                              className="mt-1"
+                            />
+                            <div>
+                              <h3 className={`font-medium ${
+                                update.completed 
+                                ? 'text-gray-400 dark:text-gray-500 line-through' 
+                                : 'text-gray-800 dark:text-gray-100'
+                              }`}>
+                                {update.title}
+                              </h3>
+                              <p className={`text-sm mt-1 ${
+                                update.completed 
+                                ? 'text-gray-400 dark:text-gray-500' 
+                                : 'text-gray-600 dark:text-gray-300'
+                              }`}>
+                                {update.description}
+                              </p>
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {update.tags.map((tag, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs dark:bg-gray-700 dark:text-gray-300">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                                {format(new Date(update.date), "PPP")}
+                              </div>
                             </div>
                           </div>
                           <Button
@@ -150,7 +181,7 @@ const InternshipSection: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     No updates added yet. Click "New Update" to add one!
                   </div>
                 )}
@@ -166,7 +197,7 @@ const InternshipSection: React.FC = () => {
                 <CheckSquare className="mr-2 h-5 w-5 text-brand-500" />
                 Internship Tasks
               </CardTitle>
-              <p className="text-sm text-gray-500">Tasks to complete for your internship</p>
+              <p className="text-sm text-gray-500 dark:text-gray-300">Tasks to complete for your internship</p>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px] pr-4">
@@ -176,7 +207,9 @@ const InternshipSection: React.FC = () => {
                       <div 
                         key={task.id} 
                         className={`flex justify-between items-start p-3 rounded-md ${
-                          task.completed ? 'bg-gray-50' : 'bg-white border border-gray-100'
+                          task.completed 
+                            ? 'bg-gray-50 dark:bg-gray-800/50' 
+                            : 'bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700'
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -186,11 +219,11 @@ const InternshipSection: React.FC = () => {
                             className="mt-1"
                           />
                           <div>
-                            <p className={`font-medium ${task.completed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                            <p className={`font-medium ${task.completed ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-800 dark:text-gray-100'}`}>
                               {task.title}
                             </p>
                             {task.description && (
-                              <p className={`text-sm ${task.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <p className={`text-sm ${task.completed ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}`}>
                                 {task.description}
                               </p>
                             )}
@@ -208,7 +241,7 @@ const InternshipSection: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     No internship tasks added yet. Click "New Task" to add one!
                   </div>
                 )}
