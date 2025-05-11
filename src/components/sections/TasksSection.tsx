@@ -11,7 +11,7 @@ import {
   Trash2, 
   Plus,
   CheckCircle,
-  ClockCheck
+  Clock
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -50,7 +50,7 @@ const TasksSection: React.FC = () => {
         <div className="flex justify-between items-center mb-2">
           <TabsList>
             <TabsTrigger value="daily" className="flex items-center">
-              <ClockCheck className="mr-2 h-4 w-4" />
+              <Clock className="mr-2 h-4 w-4" />
               Daily Tasks
             </TabsTrigger>
             <TabsTrigger value="longterm" className="flex items-center">
@@ -99,7 +99,7 @@ const TasksSection: React.FC = () => {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center">
-                <ClockCheck className="mr-2 h-5 w-5 text-brand-500" />
+                <Clock className="mr-2 h-5 w-5 text-brand-500" />
                 Daily Tasks
               </CardTitle>
               <p className="text-sm text-gray-500">Tasks to complete today</p>
