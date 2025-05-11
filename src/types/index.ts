@@ -63,6 +63,15 @@ export interface GymEntry {
   date: string;
 }
 
+export interface ScrumCard {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'todo' | 'inProgress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  createdAt: string;
+}
+
 export interface TrackerData {
   learning: LearningItem[];
   longTermPlans: Task[];
@@ -74,4 +83,5 @@ export interface TrackerData {
   };
   contentCreation: ContentIdea[];
   gymLife: GymEntry[];
+  scrumBoard: ScrumCard[];
 }

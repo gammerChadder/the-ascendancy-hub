@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { TrackerData, Task, Resource, Project, LearningItem, InternshipUpdate, ContentIdea, GymEntry } from "@/types";
+import { TrackerData, Task, Resource, Project, LearningItem, InternshipUpdate, ContentIdea, GymEntry, ScrumCard } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 
@@ -143,6 +142,32 @@ const initialData: TrackerData = {
       notes: "Focused on upper body",
       date: new Date().toISOString(),
     }
+  ],
+  scrumBoard: [
+    {
+      id: uuidv4(),
+      title: "Create homepage UI",
+      description: "Design and implement the homepage UI according to the wireframes",
+      status: "todo",
+      priority: "high",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: uuidv4(),
+      title: "Implement auth flow",
+      description: "Add login and registration functionality",
+      status: "inProgress",
+      priority: "medium",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: uuidv4(),
+      title: "Setup CI/CD pipeline",
+      description: "Configure GitHub Actions for automated testing and deployment",
+      status: "done",
+      priority: "low",
+      createdAt: new Date().toISOString(),
+    }
   ]
 };
 
@@ -174,6 +199,11 @@ interface TrackerContextType {
   deleteContentIdea: (ideaId: string) => void;
   addGymEntry: (entry: Omit<GymEntry, "id">) => void;
   deleteGymEntry: (entryId: string) => void;
+  // New Scrum Board methods
+  addScrumCard: (card: Omit<ScrumCard, "id" | "createdAt">) => void;
+  updateScrumCardStatus: (cardId: string, status: ScrumCard["status"]) => void;
+  updateScrumCard: (cardId: string, updates: Partial<ScrumCard>) => void;
+  deleteScrumCard: (cardId: string) => void;
 }
 
 const TrackerContext = createContext<TrackerContextType | undefined>(undefined);
@@ -537,6 +567,50 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     toast.success("Gym entry deleted");
   };
 
+  // Scrum Board functions
+  const addScrumCard = (card: Omit<ScrumCard, "id" | "createdAt">) => {
+    setData(prev => ({
+      ...prev,
+      scrumBoard: [
+        ...prev.scrumBoard,
+        {
+          ...card,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
+    }));
+    toast.success("Card added to Scrum Board");
+  };
+
+  const updateScrumCardStatus = (cardId: string, status: ScrumCard["status"]) => {
+    setData(prev => ({
+      ...prev,
+      scrumBoard: prev.scrumBoard.map(card => 
+        card.id === cardId ? { ...card, status } : card
+      )
+    }));
+    toast.success(`Card moved to ${status === 'todo' ? 'Todo' : status === 'inProgress' ? 'In Progress' : 'Done'}`);
+  };
+
+  const updateScrumCard = (cardId: string, updates: Partial<ScrumCard>) => {
+    setData(prev => ({
+      ...prev,
+      scrumBoard: prev.scrumBoard.map(card => 
+        card.id === cardId ? { ...card, ...updates } : card
+      )
+    }));
+    toast.success("Card updated");
+  };
+
+  const deleteScrumCard = (cardId: string) => {
+    setData(prev => ({
+      ...prev,
+      scrumBoard: prev.scrumBoard.filter(card => card.id !== cardId)
+    }));
+    toast.success("Card deleted");
+  };
+
   return (
     <TrackerContext.Provider value={{
       data,
@@ -566,6 +640,11 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       deleteContentIdea,
       addGymEntry,
       deleteGymEntry,
+      // Add new Scrum Board methods to the context
+      addScrumCard,
+      updateScrumCardStatus,
+      updateScrumCard,
+      deleteScrumCard,
     }}>
       {children}
     </TrackerContext.Provider>

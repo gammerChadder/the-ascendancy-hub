@@ -8,13 +8,15 @@ import ProjectsSection from "./sections/ProjectsSection";
 import InternshipSection from "./sections/InternshipSection";
 import ContentCreationSection from "./sections/ContentCreationSection";
 import GymLifeSection from "./sections/GymLifeSection";
+import ScrumBoardSection from "./sections/ScrumBoardSection";
 import { 
   Book, 
   CalendarCheck, 
   Projector, 
   Briefcase,
   Video,
-  Dumbbell
+  Dumbbell,
+  SquareKanban
 } from "lucide-react";
 
 const DevTrackerDashboard: React.FC = () => {
@@ -32,7 +34,7 @@ const DevTrackerDashboard: React.FC = () => {
           </div>
 
           <Tabs defaultValue="learning" className="w-full">
-            <TabsList className="grid grid-cols-3 md:grid-cols-6 mb-8">
+            <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-7 mb-8">
               <TabsTrigger value="learning" className="flex items-center">
                 <Book className="mr-2 h-4 w-4" />
                 <span className="hidden md:inline">Learning</span>
@@ -63,6 +65,11 @@ const DevTrackerDashboard: React.FC = () => {
                 <span className="hidden md:inline">Gym & Life</span>
                 <span className="md:hidden">💪</span>
               </TabsTrigger>
+              <TabsTrigger value="scrumboard" className="flex items-center">
+                <SquareKanban className="mr-2 h-4 w-4" />
+                <span className="hidden md:inline">Scrum Board</span>
+                <span className="md:hidden">📋</span>
+              </TabsTrigger>
             </TabsList>
             
             <div className="bg-white shadow-sm rounded-lg p-4 md:p-6 border border-gray-100">
@@ -83,6 +90,9 @@ const DevTrackerDashboard: React.FC = () => {
               </TabsContent>
               <TabsContent value="gym" className="mt-0">
                 <GymLifeSection />
+              </TabsContent>
+              <TabsContent value="scrumboard" className="mt-0">
+                <ScrumBoardSection />
               </TabsContent>
             </div>
           </Tabs>
