@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useTracker } from "@/context/TrackerContext";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -43,9 +42,7 @@ const ProjectsSection: React.FC = () => {
     addProject({
       title: formData.title,
       description: formData.description,
-      status: formData.status || 'not-started',
-      tasks: [],
-      resources: [],
+      status: formData.status || 'planned', // Default to 'planned'
       progress: 0,
     });
   };
@@ -115,6 +112,8 @@ const ProjectsSection: React.FC = () => {
         return <Badge className="bg-blue-500">In Progress</Badge>;
       case 'completed':
         return <Badge className="bg-green-500">Completed</Badge>;
+      case 'planned':
+        return <Badge className="bg-yellow-500">Planned</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -138,7 +137,7 @@ const ProjectsSection: React.FC = () => {
         fields={[
           { name: "title", label: "Project Name", type: "text", required: true },
           { name: "description", label: "Description", type: "textarea" },
-          { name: "status", label: "Status", type: "text", placeholder: "not-started/in-progress/completed" },
+          { name: "status", label: "Status", type: "text", placeholder: "not-started/in-progress/completed/planned" },
         ]}
       />
 

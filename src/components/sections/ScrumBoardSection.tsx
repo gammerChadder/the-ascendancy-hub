@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { useTracker } from "@/context/TrackerContext";
 import { Trash, Plus, MoveHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ScrumCard } from "@/types";
 
 type ScrumCardType = {
   id: string;
@@ -21,13 +21,13 @@ type ScrumCardType = {
 
 const ScrumBoardSection: React.FC = () => {
   const { data, addScrumCard, updateScrumCardStatus, deleteScrumCard } = useTracker();
-  const [newCard, setNewCard] = useState<Partial<ScrumCardType>>({
+  const [newCard, setNewCard] = useState<Partial<ScrumCard>>({
     title: "",
     description: "",
     priority: "medium",
   });
   const [isAddingCard, setIsAddingCard] = useState(false);
-  const draggedItem = useRef<ScrumCardType | null>(null);
+  const draggedItem = useRef<ScrumCard | null>(null);
 
   const handleAddCard = () => {
     if (newCard.title) {
@@ -42,7 +42,7 @@ const ScrumBoardSection: React.FC = () => {
     }
   };
 
-  const handleDragStart = (card: ScrumCardType) => {
+  const handleDragStart = (card: ScrumCard) => {
     draggedItem.current = card;
   };
 

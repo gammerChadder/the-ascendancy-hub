@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -467,7 +466,7 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addScrumCard = (card: Omit<ScrumCard, 'id' | 'createdAt'>) => {
     const newCard: ScrumCard = { 
       id: uuidv4(),
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(), // Ensure this is set
       ...card
     };
     setData(prev => ({ ...prev, scrumBoard: [...prev.scrumBoard, newCard] }));

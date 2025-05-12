@@ -1,4 +1,3 @@
-
 export interface Resource {
   id: string;
   title: string;
@@ -16,6 +15,13 @@ export interface Task {
   updatedAt?: string;
 }
 
+export interface ProjectTask {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -28,13 +34,6 @@ export interface Project {
   progress: number;
   tasks: ProjectTask[];
   resources: Resource[];
-}
-
-export interface ProjectTask {
-  id: string;
-  title: string;
-  description?: string;
-  completed: boolean;
 }
 
 export interface Internship {
@@ -110,7 +109,7 @@ export interface ScrumCard {
   description?: string;
   status: 'todo' | 'inProgress' | 'done';
   priority: 'low' | 'medium' | 'high';
-  createdAt?: string;
+  createdAt: string;
 }
 
 export interface Note {
