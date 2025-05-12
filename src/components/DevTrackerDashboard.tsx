@@ -10,6 +10,7 @@ import ContentCreationSection from "./sections/ContentCreationSection";
 import GymLifeSection from "./sections/GymLifeSection";
 import ScrumBoardSection from "./sections/ScrumBoardSection";
 import { Button } from "@/components/ui/button";
+import DigitalClock from "./ui-components/DigitalClock";
 import { 
   Book, 
   CalendarCheck, 
@@ -58,19 +59,22 @@ const DevTrackerDashboard: React.FC = () => {
                 Track your journey to becoming a 0-100x developer
               </p>
             </div>
-            <Button 
-              onClick={toggleTheme}
-              variant="outline"
-              size="icon"
-              className="rounded-full w-10 h-10"
-            >
-              {theme === 'light' ? (
-                <Moon className="h-5 w-5" />
-              ) : (
-                <Sun className="h-5 w-5" />
-              )}
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <div className="flex items-center gap-4">
+              <DigitalClock />
+              <Button 
+                onClick={toggleTheme}
+                variant="outline"
+                size="icon"
+                className="rounded-full w-10 h-10"
+              >
+                {theme === 'light' ? (
+                  <Moon className="h-5 w-5" />
+                ) : (
+                  <Sun className="h-5 w-5" />
+                )}
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </div>
           </div>
 
           <Tabs defaultValue="learning" className="w-full">

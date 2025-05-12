@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Plus } from "lucide-react";
+import { Edit, Plus, Trash2 } from "lucide-react";
 
 interface NotesSectionProps {
   id: string;
@@ -22,6 +22,12 @@ const NotesSection: React.FC<NotesSectionProps> = ({
   handleCancelEdit
 }) => {
   const isEditing = notesEdit && notesEdit.id === id;
+
+  // Function to handle notes deletion
+  const handleDeleteNotes = () => {
+    setNotesEdit({ id, notes: "" });
+    onUpdateNotes(id);
+  };
 
   if (isEditing) {
     return (
@@ -57,14 +63,24 @@ const NotesSection: React.FC<NotesSectionProps> = ({
     return (
       <div className="relative group">
         <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-md">{notes}</p>
-        <Button
-          variant="ghost" 
-          size="sm" 
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
-          onClick={() => onUpdateNotes(id)}
-        >
-          <Edit className="h-3 w-3" />
-        </Button>
+        <div className="absolute top-2 right-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost" 
+            size="sm" 
+            className="h-6 w-6"
+            onClick={() => onUpdateNotes(id)}
+          >
+            <Edit className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost" 
+            size="sm" 
+            className="h-6 w-6 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+            onClick={handleDeleteNotes}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
       </div>
     );
   }

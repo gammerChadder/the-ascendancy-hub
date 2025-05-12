@@ -29,7 +29,7 @@ const GymLifeSection: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Gym & Life</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Gym & Life</h2>
         <Button onClick={() => setIsAddEntryOpen(true)}>
           <Plus size={16} className="mr-2" />
           Add Entry
@@ -55,26 +55,26 @@ const GymLifeSection: React.FC = () => {
             <Dumbbell className="mr-2 h-5 w-5 text-brand-500" />
             Fitness Journal
           </CardTitle>
-          <p className="text-sm text-gray-500">Track your gym activities and life events</p>
+          <p className="text-sm text-gray-500 dark:text-gray-300">Track your gym activities and life events</p>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[350px] pr-4">
             {data.gymLife.length > 0 ? (
-              <div className="divide-y">
+              <div className="divide-y dark:divide-gray-700">
                 {data.gymLife.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((entry) => (
                   <div key={entry.id} className="py-4 first:pt-0 last:pb-0">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center mb-1">
                           <Calendar className="h-3 w-3 mr-2 text-gray-400" />
-                          <span className="text-xs text-gray-500">{format(new Date(entry.date), "PPP")}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{format(new Date(entry.date), "PPP")}</span>
                         </div>
-                        <h3 className="font-medium text-gray-800">{entry.activity}</h3>
+                        <h3 className="font-medium text-gray-800 dark:text-white">{entry.activity}</h3>
                         {entry.duration && (
-                          <p className="text-sm text-gray-500 mt-1">Duration: {entry.duration} minutes</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">Duration: {entry.duration} minutes</p>
                         )}
                         {entry.notes && (
-                          <p className="text-sm text-gray-600 mt-1">{entry.notes}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{entry.notes}</p>
                         )}
                       </div>
                       <Button
@@ -90,7 +90,7 @@ const GymLifeSection: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 No gym entries added yet. Click "Add Entry" to get started!
               </div>
             )}

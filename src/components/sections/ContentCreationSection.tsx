@@ -34,11 +34,11 @@ const ContentCreationSection: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "idea":
-        return <Badge variant="outline" className="text-gray-500 border-gray-300">Idea</Badge>;
+        return <Badge variant="outline" className="text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600">Idea</Badge>;
       case "draft":
-        return <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">Draft</Badge>;
+        return <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100 border-amber-200 dark:border-amber-800">Draft</Badge>;
       case "published":
-        return <Badge className="bg-green-500">Published</Badge>;
+        return <Badge className="bg-green-500 dark:bg-green-600">Published</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -47,7 +47,7 @@ const ContentCreationSection: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Content Creation</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Content Creation</h2>
         <Button onClick={() => setIsAddIdeaOpen(true)}>
           <Plus size={16} className="mr-2" />
           Add Content Idea
@@ -72,18 +72,18 @@ const ContentCreationSection: React.FC = () => {
             <Video className="mr-2 h-5 w-5 text-brand-500" />
             Content Ideas
           </CardTitle>
-          <p className="text-sm text-gray-500">Track your content ideas and their status</p>
+          <p className="text-sm text-gray-500 dark:text-gray-300">Track your content ideas and their status</p>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[350px] pr-4">
             {data.contentCreation.length > 0 ? (
               <div className="space-y-4">
                 {data.contentCreation.map((idea) => (
-                  <div key={idea.id} className="border border-gray-100 rounded-md p-4">
+                  <div key={idea.id} className="border border-gray-100 dark:border-gray-700 rounded-md p-4">
                     <div className="flex justify-between items-start">
                       <div className="w-full">
                         <div className="flex justify-between items-center mb-2">
-                          <h3 className="font-medium text-gray-800 pr-3">{idea.title}</h3>
+                          <h3 className="font-medium text-gray-800 dark:text-white pr-3">{idea.title}</h3>
                           <div className="flex space-x-2 items-center">
                             {getStatusBadge(idea.status)}
                             <Button
@@ -97,11 +97,11 @@ const ContentCreationSection: React.FC = () => {
                           </div>
                         </div>
                         {idea.description && (
-                          <p className="text-sm text-gray-600 mb-2">{idea.description}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{idea.description}</p>
                         )}
                         <div className="flex justify-between items-center mt-2">
                           {idea.platform && (
-                            <Badge variant="outline" className="text-xs mr-auto">
+                            <Badge variant="outline" className="text-xs mr-auto dark:text-gray-300 dark:border-gray-600">
                               {idea.platform}
                             </Badge>
                           )}
@@ -125,7 +125,7 @@ const ContentCreationSection: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 No content ideas added yet. Click "Add Content Idea" to get started!
               </div>
             )}
