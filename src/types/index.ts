@@ -1,88 +1,94 @@
-
-// Common types for the productivity tracker
+export interface Resource {
+  id: string;
+  title: string;
+  url: string;
+  description?: string;
+}
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
   completed: boolean;
-  createdAt: string;
   dueDate?: string;
-}
-
-export interface Resource {
-  id: string;
-  title: string;
-  url: string;
-  description?: string;
-  createdAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Project {
   id: string;
   title: string;
   description?: string;
-  status: 'not-started' | 'in-progress' | 'completed';
-  tasks: Task[];
-  resources: Resource[];
-  progress: number; // 0-100
-  createdAt: string;
+  status: 'planned' | 'inProgress' | 'completed' | 'onHold';
+  startDate?: string;
+  endDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Internship {
+  id: string;
+  company: string;
+  role: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Content {
+  id: string;
+  title: string;
+  type: 'blog' | 'video' | 'podcast' | 'other';
+  url?: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface GymLife {
+  id: string;
+  workout: string;
+  type: 'strength' | 'cardio' | 'yoga' | 'other';
+  duration?: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ScrumTask {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'open' | 'inProgress' | 'review' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Note {
+  id: string;
+  content: string;
 }
 
 export interface LearningItem {
   id: string;
   skill: string;
+  progress: number;
   resources: Resource[];
-  progress: number; // 0-100
-  notes?: string;
-  createdAt: string;
-}
-
-export interface InternshipUpdate {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  completed?: boolean;
-}
-
-export interface ContentIdea {
-  id: string;
-  title: string;
-  description?: string;
-  platform?: string;
-  status: 'idea' | 'draft' | 'published';
-  createdAt: string;
-}
-
-export interface GymEntry {
-  id: string;
-  activity: string;
-  duration?: number; // in minutes
-  notes?: string;
-  date: string;
-}
-
-export interface ScrumCard {
-  id: string;
-  title: string;
-  description?: string;
-  status: 'todo' | 'inProgress' | 'done';
-  priority: 'low' | 'medium' | 'high';
-  createdAt: string;
+  notes: Note[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TrackerData {
   learning: LearningItem[];
-  longTermPlans: Task[];
   dailyTasks: Task[];
+  longTermPlans: Task[];
   projects: Project[];
-  internship: {
-    updates: InternshipUpdate[];
-    todos: Task[];
-  };
-  contentCreation: ContentIdea[];
-  gymLife: GymEntry[];
-  scrumBoard: ScrumCard[];
+  internships: Internship[];
+  content: Content[];
+  gymLife: GymLife[];
+  scrumBoard: ScrumTask[];
 }
