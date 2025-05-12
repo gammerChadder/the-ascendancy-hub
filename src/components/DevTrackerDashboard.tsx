@@ -9,6 +9,7 @@ import InternshipSection from "./sections/InternshipSection";
 import ContentCreationSection from "./sections/ContentCreationSection";
 import GymLifeSection from "./sections/GymLifeSection";
 import ScrumBoardSection from "./sections/ScrumBoardSection";
+import MeetingsSection from "./sections/MeetingsSection";
 import { Button } from "@/components/ui/button";
 import DigitalClock from "./ui-components/DigitalClock";
 import { 
@@ -20,7 +21,8 @@ import {
   Dumbbell,
   SquareKanban,
   Moon,
-  Sun
+  Sun,
+  Calendar
 } from "lucide-react";
 
 const DevTrackerDashboard: React.FC = () => {
@@ -78,7 +80,7 @@ const DevTrackerDashboard: React.FC = () => {
           </div>
 
           <Tabs defaultValue="learning" className="w-full">
-            <TabsList className="grid grid-cols-4 md:grid-cols-7 mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-1">
+            <TabsList className="grid grid-cols-4 md:grid-cols-8 mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-1">
               <TabsTrigger value="learning" className="flex items-center">
                 <Book className="mr-2 h-4 w-4" />
                 <span className="hidden md:inline">Learning</span>
@@ -109,6 +111,11 @@ const DevTrackerDashboard: React.FC = () => {
                 <span className="hidden md:inline">Gym & Life</span>
                 <span className="md:hidden">💪</span>
               </TabsTrigger>
+              <TabsTrigger value="meetings" className="flex items-center">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span className="hidden md:inline">Meetings</span>
+                <span className="md:hidden">📅</span>
+              </TabsTrigger>
               <TabsTrigger value="scrumboard" className="flex items-center">
                 <SquareKanban className="mr-2 h-4 w-4" />
                 <span className="hidden md:inline">Scrum Board</span>
@@ -134,6 +141,9 @@ const DevTrackerDashboard: React.FC = () => {
               </TabsContent>
               <TabsContent value="gym" className="mt-0">
                 <GymLifeSection />
+              </TabsContent>
+              <TabsContent value="meetings" className="mt-0">
+                <MeetingsSection />
               </TabsContent>
               <TabsContent value="scrumboard" className="mt-0">
                 <ScrumBoardSection />

@@ -73,6 +73,28 @@ export interface ScrumCard {
   createdAt: string;
 }
 
+// New type for meetings
+export interface Meeting {
+  id: string;
+  title: string;
+  description?: string;
+  date: string; // ISO string
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+  attendees?: string[];
+  preparation?: string[]; // Things to prepare before meeting
+  notes?: string; // Meeting notes
+  mom?: string; // Minutes of Meeting
+  actionItems?: { 
+    id: string;
+    task: string;
+    assignee?: string;
+    dueDate?: string;
+    completed: boolean;
+  }[];
+  createdAt: string;
+}
+
 export interface TrackerData {
   learning: LearningItem[];
   longTermPlans: Task[];
@@ -85,4 +107,5 @@ export interface TrackerData {
   contentCreation: ContentIdea[];
   gymLife: GymEntry[];
   scrumBoard: ScrumCard[];
+  meetings: Meeting[]; // New addition for meetings
 }

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { TrackerData, Task, Resource, Project, LearningItem, InternshipUpdate, ContentIdea, GymEntry, ScrumCard } from "@/types";
+import { TrackerData, Task, Resource, Project, LearningItem, InternshipUpdate, ContentIdea, GymEntry, ScrumCard, Meeting } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 
@@ -168,6 +168,30 @@ const initialData: TrackerData = {
       priority: "low",
       createdAt: new Date().toISOString(),
     }
+  ],
+  meetings: [
+    {
+      id: uuidv4(),
+      title: "Weekly Team Sync",
+      description: "Regular team meeting to discuss progress and roadblocks",
+      date: new Date().toISOString(),
+      startTime: "09:00",
+      endTime: "10:00",
+      attendees: ["John Doe", "Jane Smith", "Robert Johnson"],
+      preparation: ["Prepare status update", "Review sprint backlog"],
+      notes: "",
+      mom: "",
+      actionItems: [
+        {
+          id: uuidv4(),
+          task: "Update project documentation",
+          assignee: "Jane Smith",
+          dueDate: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(),
+          completed: false,
+        }
+      ],
+      createdAt: new Date().toISOString(),
+    }
   ]
 };
 
@@ -205,6 +229,13 @@ interface TrackerContextType {
   updateScrumCardStatus: (cardId: string, status: ScrumCard["status"]) => void;
   updateScrumCard: (cardId: string, updates: Partial<ScrumCard>) => void;
   deleteScrumCard: (cardId: string) => void;
+  // Meeting methods
+  addMeeting: (meeting: Omit<Meeting, "id" | "createdAt">) => void;
+  updateMeeting: (meetingId: string, updates: Partial<Meeting>) => void;
+  deleteMeeting: (meetingId: string) => void;
+  addMeetingActionItem: (meetingId: string, actionItem: Omit<Meeting["actionItems"][0], "id">) => void;
+  updateMeetingActionItem: (meetingId: string, actionItemId: string, updates: Partial<Omit<Meeting["actionItems"][0], "id">>) => void;
+  deleteMeetingActionItem: (meetingId: string, actionItemId: string) => void;
 }
 
 const TrackerContext = createContext<TrackerContextType | undefined>(undefined);
@@ -625,6 +656,87 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     toast.success("Card deleted");
   };
 
+  // Meeting functions
+  const addMeeting = (meeting: Omit<Meeting, "id" | "createdAt">) => {
+    setData(prev => ({
+      ...prev,
+      meetings: [
+        ...prev.meetings,
+        {
+          ...meeting,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
+    }));
+    toast.success("Meeting added");
+  };
+
+  const updateMeeting = (meetingId: string, updates: Partial<Meeting>) => {
+    setData(prev => ({
+      ...prev,
+      meetings: prev.meetings.map(meeting => 
+        meeting.id === meetingId ? { ...meeting, ...updates } : meeting
+      )
+    }));
+    toast.success("Meeting updated");
+  };
+
+  const deleteMeeting = (meetingId: string) => {
+    setData(prev => ({
+      ...prev,
+      meetings: prev.meetings.filter(meeting => meeting.id !== meetingId)
+    }));
+    toast.success("Meeting deleted");
+  };
+
+  const addMeetingActionItem = (meetingId: string, actionItem: Omit<Meeting["actionItems"][0], "id">) => {
+    setData(prev => ({
+      ...prev,
+      meetings: prev.meetings.map(meeting => 
+        meeting.id === meetingId ? {
+          ...meeting,
+          actionItems: [
+            ...(meeting.actionItems || []),
+            {
+              ...actionItem,
+              id: uuidv4(),
+            }
+          ]
+        } : meeting
+      )
+    }));
+    toast.success("Action item added");
+  };
+
+  const updateMeetingActionItem = (meetingId: string, actionItemId: string, updates: Partial<Omit<Meeting["actionItems"][0], "id">>) => {
+    setData(prev => ({
+      ...prev,
+      meetings: prev.meetings.map(meeting => 
+        meeting.id === meetingId ? {
+          ...meeting,
+          actionItems: meeting.actionItems?.map(item => 
+            item.id === actionItemId ? { ...item, ...updates } : item
+          )
+        } : meeting
+      )
+    }));
+    toast.success("Action item updated");
+  };
+
+  const deleteMeetingActionItem = (meetingId: string, actionItemId: string) => {
+    setData(prev => ({
+      ...prev,
+      meetings: prev.meetings.map(meeting => 
+        meeting.id === meetingId ? {
+          ...meeting,
+          actionItems: meeting.actionItems?.filter(item => item.id !== actionItemId)
+        } : meeting
+      )
+    }));
+    toast.success("Action item deleted");
+  };
+
   return (
     <TrackerContext.Provider value={{
       data,
@@ -660,6 +772,13 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updateScrumCardStatus,
       updateScrumCard,
       deleteScrumCard,
+      // Meeting methods
+      addMeeting,
+      updateMeeting,
+      deleteMeeting,
+      addMeetingActionItem,
+      updateMeetingActionItem,
+      deleteMeetingActionItem,
     }}>
       {children}
     </TrackerContext.Provider>
