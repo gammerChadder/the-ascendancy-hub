@@ -1,536 +1,675 @@
-import React, { createContext, useContext, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
-import { 
-  LearningItem, 
-  Resource, 
-  Task, 
-  Project, 
-  ProjectTask,
-  Internship, 
-  InternshipTask,
-  InternshipUpdate,
-  Content, 
-  GymLife, 
-  ScrumCard,
-  ContentIdea,
-  TrackerData
-} from "@/types";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { TrackerData, Task, Resource, Project, LearningItem, InternshipUpdate, ContentIdea, GymEntry, ScrumCard } from "@/types";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 
-interface TrackerContextType {
-  data: TrackerData;
-  addLearningItem: (item: Omit<LearningItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateLearningItem: (id: string, updates: Partial<LearningItem>) => void;
-  deleteLearningItem: (id: string) => void;
-  addResource: (learningItemId: string, resource: Omit<Resource, 'id'>) => void;
-  deleteResource: (learningItemId: string, resourceId: string) => void;
-  addTask: (section: "dailyTasks" | "longTermPlans", task: Omit<Task, 'id'>) => void;
-  updateTask: (section: "dailyTasks" | "longTermPlans", id: string, updates: Partial<Task>) => void;
-  deleteTask: (section: "dailyTasks" | "longTermPlans", id: string) => void;
-  addProject: (project: Omit<Project, 'id' | 'tasks' | 'resources'>) => void;
-  updateProject: (id: string, updates: Partial<Omit<Project, 'tasks' | 'resources'>>) => void;
-  deleteProject: (id: string) => void;
-  addProjectTask: (projectId: string, task: Omit<ProjectTask, 'id'>) => void;
-  updateProjectTask: (projectId: string, taskId: string, updates: Partial<ProjectTask>) => void;
-  deleteProjectTask: (projectId: string, taskId: string) => void;
-  addProjectResource: (projectId: string, resource: Omit<Resource, 'id'>) => void;
-  deleteProjectResource: (projectId: string, resourceId: string) => void;
-  addInternship: (internship: Omit<Internship, 'id'>) => void;
-  updateInternship: (id: string, updates: Partial<Internship>) => void;
-  deleteInternship: (id: string) => void;
-  addInternshipTask: (task: Omit<InternshipTask, 'id'>) => void;
-  updateInternshipTask: (id: string, updates: Partial<InternshipTask>) => void;
-  deleteInternshipTask: (id: string) => void;
-  addInternshipUpdate: (update: Omit<InternshipUpdate, 'id'>) => void;
-  updateInternshipUpdate: (id: string, updates: Partial<InternshipUpdate>) => void;
-  deleteInternshipUpdate: (id: string) => void;
-  addContent: (content: Omit<Content, 'id'>) => void;
-  updateContent: (id: string, updates: Partial<Content>) => void;
-  deleteContent: (id: string) => void;
-  addContentIdea: (idea: Omit<ContentIdea, 'id'>) => void;
-  updateContentIdea: (id: string, updates: Partial<ContentIdea>) => void;
-  deleteContentIdea: (id: string) => void;
-  addGymEntry: (entry: Omit<GymLife, 'id' | 'workout' | 'type' | 'createdAt' | 'updatedAt'>) => void;
-  updateGymLife: (id: string, updates: Partial<GymLife>) => void;
-  deleteGymEntry: (id: string) => void;
-  addScrumCard: (card: Omit<ScrumCard, 'id' | 'createdAt'>) => void;
-  updateScrumCardStatus: (id: string, status: 'todo' | 'inProgress' | 'done') => void;
-  deleteScrumCard: (id: string) => void;
-}
-
+// Initial sample data
 const initialData: TrackerData = {
   learning: [
     {
       id: uuidv4(),
       skill: "React",
-      progress: 75,
       resources: [
         {
           id: uuidv4(),
-          title: "React Official Documentation",
+          title: "React Documentation",
           url: "https://reactjs.org/docs/getting-started.html",
-          description: "The official documentation for React.",
-        },
+          description: "Official React documentation",
+          createdAt: new Date().toISOString(),
+        }
       ],
-      notes: [{ id: uuidv4(), content: "Practicing React Hooks" }],
+      progress: 65,
+      notes: "Working through advanced hooks",
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     },
     {
       id: uuidv4(),
       skill: "TypeScript",
-      progress: 30,
       resources: [
         {
           id: uuidv4(),
           title: "TypeScript Handbook",
           url: "https://www.typescriptlang.org/docs/handbook/intro.html",
-          description: "Essential guide to TypeScript.",
-        },
+          description: "Official TypeScript documentation",
+          createdAt: new Date().toISOString(),
+        }
       ],
-      notes: [{ id: uuidv4(), content: "Understanding Type Definitions" }],
+      progress: 40,
+      notes: "Learning generics and utility types",
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ],
-  dailyTasks: [
-    {
-      id: uuidv4(),
-      title: "Code Review",
-      description: "Review pull requests from team members",
-      completed: false,
-      dueDate: new Date().toISOString(),
-    },
+    }
   ],
   longTermPlans: [
     {
       id: uuidv4(),
-      title: "Learn Next.js",
-      description: "Deep dive into Next.js framework",
+      title: "Become a full-stack developer",
+      description: "Master both frontend and backend technologies",
       completed: false,
-      dueDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
+      createdAt: new Date().toISOString(),
+      dueDate: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString(),
     },
+    {
+      id: uuidv4(),
+      title: "Build a SaaS product",
+      description: "Create and launch a SaaS application",
+      completed: false,
+      createdAt: new Date().toISOString(),
+      dueDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+    }
   ],
-  projects: [],
-  internships: [],
-  content: [],
-  contentCreation: [],
-  gymLife: [],
-  scrumBoard: [],
+  dailyTasks: [
+    {
+      id: uuidv4(),
+      title: "Code review PR #123",
+      completed: false,
+      createdAt: new Date().toISOString(),
+      dueDate: new Date().toISOString(),
+    },
+    {
+      id: uuidv4(),
+      title: "Study React hooks for 1 hour",
+      completed: false,
+      createdAt: new Date().toISOString(),
+      dueDate: new Date().toISOString(),
+    }
+  ],
+  projects: [
+    {
+      id: uuidv4(),
+      title: "Personal Portfolio Website",
+      description: "Creating a portfolio website to showcase my work",
+      status: "in-progress",
+      tasks: [
+        {
+          id: uuidv4(),
+          title: "Design homepage",
+          completed: true,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: uuidv4(),
+          title: "Implement responsive layout",
+          completed: false,
+          createdAt: new Date().toISOString(),
+        }
+      ],
+      resources: [
+        {
+          id: uuidv4(),
+          title: "Design inspiration",
+          url: "https://dribbble.com",
+          createdAt: new Date().toISOString(),
+        }
+      ],
+      progress: 60,
+      createdAt: new Date().toISOString(),
+    }
+  ],
   internship: {
-    todos: [],
-    updates: []
-  }
+    updates: [
+      {
+        id: uuidv4(),
+        title: "Completed onboarding",
+        description: "Finished the onboarding process and set up development environment",
+        date: new Date().toISOString(),
+        tags: ["onboarding", "setup"],
+      }
+    ],
+    todos: [
+      {
+        id: uuidv4(),
+        title: "Fix bug in login page",
+        completed: false,
+        createdAt: new Date().toISOString(),
+      }
+    ]
+  },
+  contentCreation: [
+    {
+      id: uuidv4(),
+      title: "How to Use React Hooks",
+      description: "Tutorial on using React hooks effectively",
+      platform: "Blog",
+      status: "idea",
+      createdAt: new Date().toISOString(),
+    }
+  ],
+  gymLife: [
+    {
+      id: uuidv4(),
+      activity: "Weightlifting",
+      duration: 60,
+      notes: "Focused on upper body",
+      date: new Date().toISOString(),
+    }
+  ],
+  scrumBoard: [
+    {
+      id: uuidv4(),
+      title: "Create homepage UI",
+      description: "Design and implement the homepage UI according to the wireframes",
+      status: "todo",
+      priority: "high",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: uuidv4(),
+      title: "Implement auth flow",
+      description: "Add login and registration functionality",
+      status: "inProgress",
+      priority: "medium",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: uuidv4(),
+      title: "Setup CI/CD pipeline",
+      description: "Configure GitHub Actions for automated testing and deployment",
+      status: "done",
+      priority: "low",
+      createdAt: new Date().toISOString(),
+    }
+  ]
 };
 
-const TrackerContext = createContext<TrackerContextType>({
-  data: initialData,
-  addLearningItem: () => {},
-  updateLearningItem: () => {},
-  deleteLearningItem: () => {},
-  addResource: () => {},
-  deleteResource: () => {},
-  addTask: () => {},
-  updateTask: () => {},
-  deleteTask: () => {},
-  addProject: () => {},
-  updateProject: () => {},
-  deleteProject: () => {},
-  addProjectTask: () => {},
-  updateProjectTask: () => {},
-  deleteProjectTask: () => {},
-  addProjectResource: () => {},
-  deleteProjectResource: () => {},
-  addInternship: () => {},
-  updateInternship: () => {},
-  deleteInternship: () => {},
-  addInternshipTask: () => {},
-  updateInternshipTask: () => {},
-  deleteInternshipTask: () => {},
-  addInternshipUpdate: () => {},
-  updateInternshipUpdate: () => {},
-  deleteInternshipUpdate: () => {},
-  addContent: () => {},
-  updateContent: () => {},
-  deleteContent: () => {},
-  addContentIdea: () => {},
-  updateContentIdea: () => {},
-  deleteContentIdea: () => {},
-  addGymEntry: () => {},
-  updateGymLife: () => {},
-  deleteGymEntry: () => {},
-  addScrumCard: () => {},
-  updateScrumCardStatus: () => {},
-  deleteScrumCard: () => {},
-});
+interface TrackerContextType {
+  data: TrackerData;
+  addTask: (section: keyof Pick<TrackerData, "longTermPlans" | "dailyTasks">, task: Omit<Task, "id" | "createdAt">) => void;
+  addInternshipTask: (task: Omit<Task, "id" | "createdAt">) => void;
+  updateTask: (section: keyof Pick<TrackerData, "longTermPlans" | "dailyTasks">, taskId: string, updates: Partial<Task>) => void;
+  updateInternshipTask: (taskId: string, updates: Partial<Task>) => void;
+  deleteTask: (section: keyof Pick<TrackerData, "longTermPlans" | "dailyTasks">, taskId: string) => void;
+  deleteInternshipTask: (taskId: string) => void;
+  addLearningItem: (item: Omit<LearningItem, "id" | "createdAt">) => void;
+  updateLearningItem: (itemId: string, updates: Partial<LearningItem>) => void;
+  deleteLearningItem: (itemId: string) => void;
+  addResource: (learningItemId: string, resource: Omit<Resource, "id" | "createdAt">) => void;
+  deleteResource: (learningItemId: string, resourceId: string) => void;
+  addProject: (project: Omit<Project, "id" | "createdAt">) => void;
+  updateProject: (projectId: string, updates: Partial<Project>) => void;
+  deleteProject: (projectId: string) => void;
+  addProjectTask: (projectId: string, task: Omit<Task, "id" | "createdAt">) => void;
+  updateProjectTask: (projectId: string, taskId: string, updates: Partial<Task>) => void;
+  deleteProjectTask: (projectId: string, taskId: string) => void;
+  addProjectResource: (projectId: string, resource: Omit<Resource, "id" | "createdAt">) => void;
+  deleteProjectResource: (projectId: string, resourceId: string) => void;
+  addInternshipUpdate: (update: Omit<InternshipUpdate, "id">) => void;
+  updateInternshipUpdate: (updateId: string, updates: Partial<InternshipUpdate>) => void;
+  deleteInternshipUpdate: (updateId: string) => void;
+  addContentIdea: (idea: Omit<ContentIdea, "id" | "createdAt">) => void;
+  updateContentIdea: (ideaId: string, updates: Partial<ContentIdea>) => void;
+  deleteContentIdea: (ideaId: string) => void;
+  addGymEntry: (entry: Omit<GymEntry, "id">) => void;
+  deleteGymEntry: (entryId: string) => void;
+  // Scrum Board methods
+  addScrumCard: (card: Omit<ScrumCard, "id" | "createdAt">) => void;
+  updateScrumCardStatus: (cardId: string, status: ScrumCard["status"]) => void;
+  updateScrumCard: (cardId: string, updates: Partial<ScrumCard>) => void;
+  deleteScrumCard: (cardId: string) => void;
+}
+
+const TrackerContext = createContext<TrackerContextType | undefined>(undefined);
 
 export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<TrackerData>(() => {
+    const savedData = localStorage.getItem("trackerData");
+    return savedData ? JSON.parse(savedData) : initialData;
+  });
 
-  const addLearningItem = (item: Omit<LearningItem, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newItem: LearningItem = {
-      id: uuidv4(),
-      ...item,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setData(prev => ({ ...prev, learning: [...prev.learning, newItem] }));
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("trackerData", JSON.stringify(data));
+  }, [data]);
+
+  // Tasks functions (longTermPlans and dailyTasks)
+  const addTask = (section: keyof Pick<TrackerData, "longTermPlans" | "dailyTasks">, task: Omit<Task, "id" | "createdAt">) => {
+    setData(prev => ({
+      ...prev,
+      [section]: [
+        ...prev[section],
+        {
+          ...task,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
+    }));
+    toast.success(`Task added to ${section === "longTermPlans" ? "Long Term Plans" : "Daily Tasks"}`);
   };
 
-  const updateLearningItem = (id: string, updates: Partial<LearningItem>) => {
+  const updateTask = (section: keyof Pick<TrackerData, "longTermPlans" | "dailyTasks">, taskId: string, updates: Partial<Task>) => {
+    setData(prev => ({
+      ...prev,
+      [section]: prev[section].map(task => 
+        task.id === taskId ? { ...task, ...updates } : task
+      )
+    }));
+    toast.success("Task updated");
+  };
+
+  const deleteTask = (section: keyof Pick<TrackerData, "longTermPlans" | "dailyTasks">, taskId: string) => {
+    setData(prev => ({
+      ...prev,
+      [section]: prev[section].filter(task => task.id !== taskId)
+    }));
+    toast.success("Task deleted");
+  };
+
+  // Internship tasks
+  const addInternshipTask = (task: Omit<Task, "id" | "createdAt">) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        todos: [
+          ...prev.internship.todos,
+          {
+            ...task,
+            id: uuidv4(),
+            createdAt: new Date().toISOString(),
+          }
+        ]
+      }
+    }));
+    toast.success("Internship task added");
+  };
+
+  const updateInternshipTask = (taskId: string, updates: Partial<Task>) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        todos: prev.internship.todos.map(task => 
+          task.id === taskId ? { ...task, ...updates } : task
+        )
+      }
+    }));
+    toast.success("Internship task updated");
+  };
+
+  const deleteInternshipTask = (taskId: string) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        todos: prev.internship.todos.filter(task => task.id !== taskId)
+      }
+    }));
+    toast.success("Internship task deleted");
+  };
+
+  // Learning items
+  const addLearningItem = (item: Omit<LearningItem, "id" | "createdAt">) => {
+    setData(prev => ({
+      ...prev,
+      learning: [
+        ...prev.learning,
+        {
+          ...item,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
+    }));
+    toast.success("Learning skill added");
+  };
+
+  const updateLearningItem = (itemId: string, updates: Partial<LearningItem>) => {
     setData(prev => ({
       ...prev,
       learning: prev.learning.map(item => 
-        item.id === id 
-          ? { ...item, ...updates, updatedAt: new Date().toISOString() }
-          : item
+        item.id === itemId ? { ...item, ...updates } : item
       )
     }));
+    toast.success("Learning skill updated");
   };
 
-  const deleteLearningItem = (id: string) => {
-    setData(prev => ({ ...prev, learning: prev.learning.filter(item => item.id !== id) }));
-  };
-
-  const addResource = (learningItemId: string, resource: Omit<Resource, 'id'>) => {
-    const newResource: Resource = { id: uuidv4(), ...resource };
+  const deleteLearningItem = (itemId: string) => {
     setData(prev => ({
       ...prev,
-      learning: prev.learning.map(item =>
-        item.id === learningItemId
-          ? { ...item, resources: [...item.resources, newResource] }
-          : item
-      ),
+      learning: prev.learning.filter(item => item.id !== itemId)
     }));
+    toast.success("Learning skill deleted");
+  };
+
+  // Resources for learning items
+  const addResource = (learningItemId: string, resource: Omit<Resource, "id" | "createdAt">) => {
+    setData(prev => ({
+      ...prev,
+      learning: prev.learning.map(item => 
+        item.id === learningItemId ? {
+          ...item,
+          resources: [
+            ...item.resources,
+            {
+              ...resource,
+              id: uuidv4(),
+              createdAt: new Date().toISOString(),
+            }
+          ]
+        } : item
+      )
+    }));
+    toast.success("Resource added");
   };
 
   const deleteResource = (learningItemId: string, resourceId: string) => {
     setData(prev => ({
       ...prev,
-      learning: prev.learning.map(item =>
-        item.id === learningItemId
-          ? { ...item, resources: item.resources.filter(r => r.id !== resourceId) }
-          : item
-      ),
+      learning: prev.learning.map(item => 
+        item.id === learningItemId ? {
+          ...item,
+          resources: item.resources.filter(res => res.id !== resourceId)
+        } : item
+      )
     }));
+    toast.success("Resource deleted");
   };
 
-  const addTask = (section: "dailyTasks" | "longTermPlans", task: Omit<Task, 'id'>) => {
-    const newTask: Task = { id: uuidv4(), ...task };
-    setData(prev => ({ ...prev, [section]: [...prev[section], newTask] }));
-  };
-
-  const updateTask = (section: "dailyTasks" | "longTermPlans", id: string, updates: Partial<Task>) => {
+  // Projects
+  const addProject = (project: Omit<Project, "id" | "createdAt">) => {
     setData(prev => ({
       ...prev,
-      [section]: prev[section].map(task =>
-        task.id === id ? { ...task, ...updates } : task
-      ),
+      projects: [
+        ...prev.projects,
+        {
+          ...project,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
     }));
+    toast.success("Project added");
   };
 
-  const deleteTask = (section: "dailyTasks" | "longTermPlans", id: string) => {
-    setData(prev => ({ ...prev, [section]: prev[section].filter(task => task.id !== id) }));
-  };
-
-  const addProject = (project: Omit<Project, 'id' | 'tasks' | 'resources'>) => {
-    const newProject: Project = { 
-      id: uuidv4(), 
-      ...project,
-      tasks: [],
-      resources: [],
-      progress: project.progress || 0
-    };
-    setData(prev => ({ ...prev, projects: [...prev.projects, newProject] }));
-  };
-
-  const updateProject = (id: string, updates: Partial<Omit<Project, 'tasks' | 'resources'>>) => {
+  const updateProject = (projectId: string, updates: Partial<Project>) => {
     setData(prev => ({
       ...prev,
-      projects: prev.projects.map(project =>
-        project.id === id ? { ...project, ...updates } : project
-      ),
+      projects: prev.projects.map(project => 
+        project.id === projectId ? { ...project, ...updates } : project
+      )
     }));
+    toast.success("Project updated");
   };
 
-  const deleteProject = (id: string) => {
-    setData(prev => ({ ...prev, projects: prev.projects.filter(project => project.id !== id) }));
-  };
-
-  const addProjectTask = (projectId: string, task: Omit<ProjectTask, 'id'>) => {
-    const newTask: ProjectTask = { id: uuidv4(), ...task };
+  const deleteProject = (projectId: string) => {
     setData(prev => ({
       ...prev,
-      projects: prev.projects.map(project =>
-        project.id === projectId
-          ? { ...project, tasks: [...project.tasks, newTask] }
-          : project
-      ),
+      projects: prev.projects.filter(project => project.id !== projectId)
     }));
+    toast.success("Project deleted");
   };
 
-  const updateProjectTask = (projectId: string, taskId: string, updates: Partial<ProjectTask>) => {
+  // Project tasks
+  const addProjectTask = (projectId: string, task: Omit<Task, "id" | "createdAt">) => {
     setData(prev => ({
       ...prev,
-      projects: prev.projects.map(project =>
-        project.id === projectId
-          ? {
-              ...project,
-              tasks: project.tasks.map(task =>
-                task.id === taskId ? { ...task, ...updates } : task
-              ),
+      projects: prev.projects.map(project => 
+        project.id === projectId ? {
+          ...project,
+          tasks: [
+            ...project.tasks,
+            {
+              ...task,
+              id: uuidv4(),
+              createdAt: new Date().toISOString(),
             }
-          : project
-      ),
+          ]
+        } : project
+      )
     }));
+    toast.success("Project task added");
+  };
+
+  const updateProjectTask = (projectId: string, taskId: string, updates: Partial<Task>) => {
+    setData(prev => ({
+      ...prev,
+      projects: prev.projects.map(project => 
+        project.id === projectId ? {
+          ...project,
+          tasks: project.tasks.map(task => 
+            task.id === taskId ? { ...task, ...updates } : task
+          )
+        } : project
+      )
+    }));
+    toast.success("Project task updated");
   };
 
   const deleteProjectTask = (projectId: string, taskId: string) => {
     setData(prev => ({
       ...prev,
-      projects: prev.projects.map(project =>
-        project.id === projectId
-          ? { ...project, tasks: project.tasks.filter(task => task.id !== taskId) }
-          : project
-      ),
+      projects: prev.projects.map(project => 
+        project.id === projectId ? {
+          ...project,
+          tasks: project.tasks.filter(task => task.id !== taskId)
+        } : project
+      )
     }));
+    toast.success("Project task deleted");
   };
 
-  const addProjectResource = (projectId: string, resource: Omit<Resource, 'id'>) => {
-    const newResource: Resource = { id: uuidv4(), ...resource };
+  // Project resources
+  const addProjectResource = (projectId: string, resource: Omit<Resource, "id" | "createdAt">) => {
     setData(prev => ({
       ...prev,
-      projects: prev.projects.map(project =>
-        project.id === projectId
-          ? { ...project, resources: [...project.resources, newResource] }
-          : project
-      ),
+      projects: prev.projects.map(project => 
+        project.id === projectId ? {
+          ...project,
+          resources: [
+            ...project.resources,
+            {
+              ...resource,
+              id: uuidv4(),
+              createdAt: new Date().toISOString(),
+            }
+          ]
+        } : project
+      )
     }));
+    toast.success("Project resource added");
   };
 
   const deleteProjectResource = (projectId: string, resourceId: string) => {
     setData(prev => ({
       ...prev,
-      projects: prev.projects.map(project =>
-        project.id === projectId
-          ? { ...project, resources: project.resources.filter(r => r.id !== resourceId) }
-          : project
-      ),
+      projects: prev.projects.map(project => 
+        project.id === projectId ? {
+          ...project,
+          resources: project.resources.filter(res => res.id !== resourceId)
+        } : project
+      )
     }));
+    toast.success("Project resource deleted");
   };
 
-  const addInternship = (internship: Omit<Internship, 'id'>) => {
-    const newInternship: Internship = { id: uuidv4(), ...internship };
-    setData(prev => ({ ...prev, internships: [...prev.internships, newInternship] }));
-  };
-
-  const updateInternship = (id: string, updates: Partial<Internship>) => {
-    setData(prev => ({
-      ...prev,
-      internships: prev.internships.map(internship =>
-        internship.id === id ? { ...internship, ...updates } : internship
-      ),
-    }));
-  };
-
-  const deleteInternship = (id: string) => {
-    setData(prev => ({ ...prev, internships: prev.internships.filter(internship => internship.id !== id) }));
-  };
-
-  const addInternshipTask = (task: Omit<InternshipTask, 'id'>) => {
-    const newTask: InternshipTask = { id: uuidv4(), ...task };
+  // Internship updates
+  const addInternshipUpdate = (update: Omit<InternshipUpdate, "id">) => {
     setData(prev => ({
       ...prev,
       internship: {
         ...prev.internship,
-        todos: [...prev.internship.todos, newTask]
+        updates: [
+          ...prev.internship.updates,
+          {
+            ...update,
+            id: uuidv4(),
+          }
+        ]
       }
     }));
+    toast.success("Internship update added");
   };
 
-  const updateInternshipTask = (id: string, updates: Partial<InternshipTask>) => {
+  const updateInternshipUpdate = (updateId: string, updates: Partial<InternshipUpdate>) => {
     setData(prev => ({
       ...prev,
       internship: {
         ...prev.internship,
-        todos: prev.internship.todos.map(task =>
-          task.id === id ? { ...task, ...updates } : task
+        updates: prev.internship.updates.map(update => 
+          update.id === updateId ? { ...update, ...updates } : update
         )
       }
     }));
+    toast.success("Internship update modified");
   };
 
-  const deleteInternshipTask = (id: string) => {
+  const deleteInternshipUpdate = (updateId: string) => {
     setData(prev => ({
       ...prev,
       internship: {
         ...prev.internship,
-        todos: prev.internship.todos.filter(task => task.id !== id)
+        updates: prev.internship.updates.filter(update => update.id !== updateId)
       }
     }));
+    toast.success("Internship update deleted");
   };
 
-  const addInternshipUpdate = (update: Omit<InternshipUpdate, 'id'>) => {
-    const newUpdate: InternshipUpdate = { id: uuidv4(), ...update };
+  // Content ideas
+  const addContentIdea = (idea: Omit<ContentIdea, "id" | "createdAt">) => {
     setData(prev => ({
       ...prev,
-      internship: {
-        ...prev.internship,
-        updates: [...prev.internship.updates, newUpdate]
-      }
+      contentCreation: [
+        ...prev.contentCreation,
+        {
+          ...idea,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
     }));
+    toast.success("Content idea added");
   };
 
-  const updateInternshipUpdate = (id: string, updates: Partial<InternshipUpdate>) => {
+  const updateContentIdea = (ideaId: string, updates: Partial<ContentIdea>) => {
     setData(prev => ({
       ...prev,
-      internship: {
-        ...prev.internship,
-        updates: prev.internship.updates.map(update =>
-          update.id === id ? { ...update, ...updates } : update
-        )
-      }
+      contentCreation: prev.contentCreation.map(idea => 
+        idea.id === ideaId ? { ...idea, ...updates } : idea
+      )
     }));
+    toast.success("Content idea updated");
   };
 
-  const deleteInternshipUpdate = (id: string) => {
+  const deleteContentIdea = (ideaId: string) => {
     setData(prev => ({
       ...prev,
-      internship: {
-        ...prev.internship,
-        updates: prev.internship.updates.filter(update => update.id !== id)
-      }
+      contentCreation: prev.contentCreation.filter(idea => idea.id !== ideaId)
     }));
+    toast.success("Content idea deleted");
   };
 
-  const addContent = (content: Omit<Content, 'id'>) => {
-    const newContent: Content = { id: uuidv4(), ...content };
-    setData(prev => ({ ...prev, content: [...prev.content, newContent] }));
-  };
-
-  const updateContent = (id: string, updates: Partial<Content>) => {
+  // Gym entries
+  const addGymEntry = (entry: Omit<GymEntry, "id">) => {
     setData(prev => ({
       ...prev,
-      content: prev.content.map(content =>
-        content.id === id ? { ...content, ...updates } : content
-      ),
+      gymLife: [
+        ...prev.gymLife,
+        {
+          ...entry,
+          id: uuidv4(),
+        }
+      ]
     }));
+    toast.success("Gym entry added");
   };
 
-  const deleteContent = (id: string) => {
-    setData(prev => ({ ...prev, content: prev.content.filter(content => content.id !== id) }));
-  };
-
-  const addContentIdea = (idea: Omit<ContentIdea, 'id'>) => {
-    const newIdea: ContentIdea = { id: uuidv4(), ...idea };
-    setData(prev => ({ ...prev, contentCreation: [...prev.contentCreation, newIdea] }));
-  };
-
-  const updateContentIdea = (id: string, updates: Partial<ContentIdea>) => {
+  const deleteGymEntry = (entryId: string) => {
     setData(prev => ({
       ...prev,
-      contentCreation: prev.contentCreation.map(idea =>
-        idea.id === id ? { ...idea, ...updates } : idea
-      ),
+      gymLife: prev.gymLife.filter(entry => entry.id !== entryId)
     }));
+    toast.success("Gym entry deleted");
   };
 
-  const deleteContentIdea = (id: string) => {
-    setData(prev => ({ ...prev, contentCreation: prev.contentCreation.filter(idea => idea.id !== id) }));
-  };
-
-  const addGymEntry = (entry: Omit<GymLife, 'id' | 'workout' | 'type' | 'createdAt' | 'updatedAt'>) => {
-    const newEntry: GymLife = { 
-      id: uuidv4(),
-      workout: entry.activity,
-      type: 'other',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      ...entry
-    };
-    setData(prev => ({ ...prev, gymLife: [...prev.gymLife, newEntry] }));
-  };
-
-  const updateGymLife = (id: string, updates: Partial<GymLife>) => {
+  // Scrum Board functions
+  const addScrumCard = (card: Omit<ScrumCard, "id" | "createdAt">) => {
     setData(prev => ({
       ...prev,
-      gymLife: prev.gymLife.map(entry =>
-        entry.id === id ? { ...entry, ...updates, updatedAt: new Date().toISOString() } : entry
-      ),
+      scrumBoard: [
+        ...prev.scrumBoard,
+        {
+          ...card,
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+        }
+      ]
     }));
+    toast.success("Card added to Scrum Board");
   };
 
-  const deleteGymEntry = (id: string) => {
-    setData(prev => ({ ...prev, gymLife: prev.gymLife.filter(entry => entry.id !== id) }));
-  };
-
-  const addScrumCard = (card: Omit<ScrumCard, 'id' | 'createdAt'>) => {
-    const newCard: ScrumCard = { 
-      id: uuidv4(),
-      createdAt: new Date().toISOString(), // Ensure this is set
-      ...card
-    };
-    setData(prev => ({ ...prev, scrumBoard: [...prev.scrumBoard, newCard] }));
-  };
-
-  const updateScrumCardStatus = (id: string, status: 'todo' | 'inProgress' | 'done') => {
+  const updateScrumCardStatus = (cardId: string, status: ScrumCard["status"]) => {
     setData(prev => ({
       ...prev,
-      scrumBoard: prev.scrumBoard.map(card =>
-        card.id === id ? { ...card, status } : card
-      ),
+      scrumBoard: prev.scrumBoard.map(card => 
+        card.id === cardId ? { ...card, status } : card
+      )
     }));
+    toast.success(`Card moved to ${status === 'todo' ? 'Todo' : status === 'inProgress' ? 'In Progress' : 'Done'}`);
   };
 
-  const deleteScrumCard = (id: string) => {
-    setData(prev => ({ ...prev, scrumBoard: prev.scrumBoard.filter(card => card.id !== id) }));
+  const updateScrumCard = (cardId: string, updates: Partial<ScrumCard>) => {
+    setData(prev => ({
+      ...prev,
+      scrumBoard: prev.scrumBoard.map(card => 
+        card.id === cardId ? { ...card, ...updates } : card
+      )
+    }));
+    toast.success("Card updated");
+  };
+
+  const deleteScrumCard = (cardId: string) => {
+    setData(prev => ({
+      ...prev,
+      scrumBoard: prev.scrumBoard.filter(card => card.id !== cardId)
+    }));
+    toast.success("Card deleted");
   };
 
   return (
-    <TrackerContext.Provider
-      value={{
-        data,
-        addLearningItem,
-        updateLearningItem,
-        deleteLearningItem,
-        addResource,
-        deleteResource,
-        addTask,
-        updateTask,
-        deleteTask,
-        addProject,
-        updateProject,
-        deleteProject,
-        addProjectTask,
-        updateProjectTask,
-        deleteProjectTask,
-        addProjectResource,
-        deleteProjectResource,
-        addInternship,
-        updateInternship,
-        deleteInternship,
-        addInternshipTask,
-        updateInternshipTask,
-        deleteInternshipTask,
-        addInternshipUpdate,
-        updateInternshipUpdate,
-        deleteInternshipUpdate,
-        addContent,
-        updateContent,
-        deleteContent,
-        addContentIdea,
-        updateContentIdea,
-        deleteContentIdea,
-        addGymEntry,
-        updateGymLife,
-        deleteGymEntry,
-        addScrumCard,
-        updateScrumCardStatus,
-        deleteScrumCard
-      }}
-    >
+    <TrackerContext.Provider value={{
+      data,
+      addTask,
+      updateTask,
+      deleteTask,
+      addInternshipTask,
+      updateInternshipTask,
+      deleteInternshipTask,
+      addLearningItem,
+      updateLearningItem,
+      deleteLearningItem,
+      addResource,
+      deleteResource,
+      addProject,
+      updateProject,
+      deleteProject,
+      addProjectTask,
+      updateProjectTask,
+      deleteProjectTask,
+      addProjectResource,
+      deleteProjectResource,
+      addInternshipUpdate,
+      updateInternshipUpdate,
+      deleteInternshipUpdate,
+      addContentIdea,
+      updateContentIdea,
+      deleteContentIdea,
+      addGymEntry,
+      deleteGymEntry,
+      // Scrum Board methods
+      addScrumCard,
+      updateScrumCardStatus,
+      updateScrumCard,
+      deleteScrumCard,
+    }}>
       {children}
     </TrackerContext.Provider>
   );
 };
 
-export const useTracker = () => useContext(TrackerContext);
+export const useTracker = () => {
+  const context = useContext(TrackerContext);
+  if (context === undefined) {
+    throw new Error("useTracker must be used within a TrackerProvider");
+  }
+  return context;
+};

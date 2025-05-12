@@ -8,7 +8,6 @@ import SkillCard from "../learning/SkillCard";
 import EmptySkillsCard from "../learning/EmptySkillsCard";
 import NotesSection from "../learning/NotesSection";
 import ResourcesSection from "../learning/ResourcesSection";
-import { v4 as uuidv4 } from "uuid";
 
 const LearningSection: React.FC = () => {
   const { data, addLearningItem, updateLearningItem, deleteLearningItem, addResource, deleteResource } = useTracker();
@@ -16,13 +15,14 @@ const LearningSection: React.FC = () => {
   const [isAddResourceOpen, setIsAddResourceOpen] = useState(false);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [progressEdit, setProgressEdit] = useState<{ id: string; progress: number } | null>(null);
+  const [notesEdit, setNotesEdit] = useState<{ id: string; notes: string } | null>(null);
 
   const handleAddSkill = (formData: Record<string, any>) => {
     addLearningItem({
       skill: formData.skill,
       resources: [],
       progress: Number(formData.progress) || 0,
-      notes: [],
+      notes: formData.notes,
     });
   };
 
@@ -48,30 +48,26 @@ const LearningSection: React.FC = () => {
     }
   };
 
-  const handleAddNote = (skillId: string, content: string) => {
-    const skill = data.learning.find(item => item.id === skillId);
-    if (skill) {
-      const notes = Array.isArray(skill.notes) ? skill.notes : [];
-      const newNote = { id: uuidv4(), content };
-      updateLearningItem(skillId, { notes: [...notes, newNote] });
+  const handleUpdateNotes = (id: string) => {
+    if (notesEdit && notesEdit.id === id) {
+      updateLearningItem(id, { notes: notesEdit.notes });
+      setNotesEdit(null);
+    } else {
+      const skill = data.learning.find(item => item.id === id);
+      if (skill) {
+        setNotesEdit({ id, notes: skill.notes || "" });
+      }
     }
   };
 
-  const handleDeleteNote = (skillId: string, noteId: string) => {
-    const skill = data.learning.find(item => item.id === skillId);
-    if (skill && Array.isArray(skill.notes)) {
-      const updatedNotes = skill.notes.filter(note => note.id !== noteId);
-      updateLearningItem(skillId, { notes: updatedNotes });
-    }
+  const handleCancelEdit = () => {
+    setProgressEdit(null);
+    setNotesEdit(null);
   };
 
   const handleOpenAddResource = (skillId: string) => {
     setSelectedSkillId(skillId);
     setIsAddResourceOpen(true);
-  };
-
-  const handleCancelEdit = () => {
-    setProgressEdit(null);
   };
 
   return (
@@ -95,7 +91,8 @@ const LearningSection: React.FC = () => {
         onSubmit={handleAddSkill}
         fields={[
           { name: "skill", label: "Skill Name", type: "text", required: true },
-          { name: "progress", label: "Current Progress (%)", type: "number", placeholder: "0" }
+          { name: "progress", label: "Current Progress (%)", type: "number", placeholder: "0" },
+          { name: "notes", label: "Notes", type: "textarea" }
         ]}
       />
 
@@ -122,16 +119,17 @@ const LearningSection: React.FC = () => {
               id={skill.id}
               skill={skill.skill}
               progress={skill.progress}
-              notes={skill.notes || []}
+              notes={skill.notes}
               resources={skill.resources}
               onDelete={deleteLearningItem}
               onUpdateProgress={handleUpdateProgress}
-              onAddNote={handleAddNote}
-              onDeleteNote={handleDeleteNote}
+              onUpdateNotes={handleUpdateNotes}
               onAddResource={handleOpenAddResource}
               onDeleteResource={deleteResource}
               progressEdit={progressEdit}
+              notesEdit={notesEdit}
               setProgressEdit={setProgressEdit}
+              setNotesEdit={setNotesEdit}
               handleCancelEdit={handleCancelEdit}
             />
           ))

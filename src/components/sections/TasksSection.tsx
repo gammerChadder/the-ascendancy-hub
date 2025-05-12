@@ -48,23 +48,23 @@ const TasksSection: React.FC = () => {
     <div className="space-y-4">
       <Tabs defaultValue="daily" className="w-full">
         <div className="flex justify-between items-center mb-2">
-          <TabsList className="bg-gray-100 dark:bg-gray-800">
-            <TabsTrigger value="daily" className="flex items-center data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">
+          <TabsList>
+            <TabsTrigger value="daily" className="flex items-center">
               <Clock className="mr-2 h-4 w-4" />
               Daily Tasks
             </TabsTrigger>
-            <TabsTrigger value="longterm" className="flex items-center data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">
+            <TabsTrigger value="longterm" className="flex items-center">
               <Calendar className="mr-2 h-4 w-4" />
               Long Term Plans
             </TabsTrigger>
           </TabsList>
           
           <div className="flex space-x-2">
-            <Button onClick={() => setIsAddDailyTaskOpen(true)} size="sm" className="bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700">
+            <Button onClick={() => setIsAddDailyTaskOpen(true)} size="sm">
               <Plus size={16} className="mr-2" />
               Daily Task
             </Button>
-            <Button onClick={() => setIsAddLongTermPlanOpen(true)} size="sm" className="bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-700">
+            <Button onClick={() => setIsAddLongTermPlanOpen(true)} size="sm">
               <Plus size={16} className="mr-2" />
               Long Term Plan
             </Button>
@@ -96,13 +96,13 @@ const TasksSection: React.FC = () => {
         />
 
         <TabsContent value="daily" className="pt-2">
-          <Card className="border-gray-200 dark:border-gray-700 dark:bg-gray-800">
+          <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center text-gray-800 dark:text-gray-100">
-                <Clock className="mr-2 h-5 w-5 text-brand-500 dark:text-brand-400" />
+              <CardTitle className="text-xl flex items-center">
+                <Clock className="mr-2 h-5 w-5 text-brand-500" />
                 Daily Tasks
               </CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Tasks to complete today</p>
+              <p className="text-sm text-gray-500">Tasks to complete today</p>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px] pr-4">
@@ -112,9 +112,7 @@ const TasksSection: React.FC = () => {
                       <div 
                         key={task.id} 
                         className={`flex justify-between items-center p-3 rounded-md ${
-                          task.completed 
-                            ? 'bg-gray-50 dark:bg-gray-700/50' 
-                            : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700'
+                          task.completed ? 'bg-gray-50' : 'bg-white border border-gray-100'
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -124,26 +122,18 @@ const TasksSection: React.FC = () => {
                             className="mt-1"
                           />
                           <div>
-                            <p className={`font-medium ${
-                              task.completed 
-                                ? 'text-gray-400 dark:text-gray-500 line-through' 
-                                : 'text-gray-800 dark:text-gray-100'
-                            }`}>
+                            <p className={`font-medium ${task.completed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
                               {task.title}
                             </p>
                             {task.description && (
-                              <p className={`text-sm ${
-                                task.completed 
-                                  ? 'text-gray-400 dark:text-gray-500' 
-                                  : 'text-gray-600 dark:text-gray-300'
-                              }`}>
+                              <p className={`text-sm ${task.completed ? 'text-gray-400' : 'text-gray-600'}`}>
                                 {task.description}
                               </p>
                             )}
                             {task.dueDate && (
                               <div className="flex items-center mt-1">
-                                <Calendar className="h-3 w-3 mr-1 text-gray-400 dark:text-gray-500" />
-                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+                                <span className="text-xs text-gray-400">
                                   {format(new Date(task.dueDate), "PPP")}
                                 </span>
                               </div>
@@ -162,7 +152,7 @@ const TasksSection: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="text-center py-8 text-gray-500">
                     No daily tasks added yet. Click "Daily Task" to add one!
                   </div>
                 )}
@@ -172,13 +162,13 @@ const TasksSection: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="longterm" className="pt-2">
-          <Card className="border-gray-200 dark:border-gray-700 dark:bg-gray-800">
+          <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center text-gray-800 dark:text-gray-100">
-                <Calendar className="mr-2 h-5 w-5 text-brand-500 dark:text-brand-400" />
+              <CardTitle className="text-xl flex items-center">
+                <Calendar className="mr-2 h-5 w-5 text-brand-500" />
                 Long Term Plans
               </CardTitle>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Plans and goals for your development journey</p>
+              <p className="text-sm text-gray-500">Plans and goals for your development journey</p>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px] pr-4">
@@ -188,9 +178,7 @@ const TasksSection: React.FC = () => {
                       <div 
                         key={plan.id} 
                         className={`flex justify-between items-center p-4 rounded-md ${
-                          plan.completed 
-                            ? 'bg-gray-50 dark:bg-gray-700/50' 
-                            : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700'
+                          plan.completed ? 'bg-gray-50' : 'bg-white border border-gray-100'
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -200,26 +188,18 @@ const TasksSection: React.FC = () => {
                             className="mt-1"
                           />
                           <div>
-                            <p className={`font-medium ${
-                              plan.completed 
-                                ? 'text-gray-400 dark:text-gray-500 line-through' 
-                                : 'text-gray-800 dark:text-gray-100'
-                            }`}>
+                            <p className={`font-medium ${plan.completed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
                               {plan.title}
                             </p>
                             {plan.description && (
-                              <p className={`text-sm ${
-                                plan.completed 
-                                  ? 'text-gray-400 dark:text-gray-500' 
-                                  : 'text-gray-600 dark:text-gray-300'
-                              }`}>
+                              <p className={`text-sm ${plan.completed ? 'text-gray-400' : 'text-gray-600'}`}>
                                 {plan.description}
                               </p>
                             )}
                             {plan.dueDate && (
                               <div className="flex items-center mt-1">
-                                <Calendar className="h-3 w-3 mr-1 text-gray-400 dark:text-gray-500" />
-                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+                                <span className="text-xs text-gray-400">
                                   Target: {format(new Date(plan.dueDate), "PPP")}
                                 </span>
                               </div>
@@ -238,7 +218,7 @@ const TasksSection: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="text-center py-8 text-gray-500">
                     No long term plans added yet. Click "Long Term Plan" to add one!
                   </div>
                 )}
