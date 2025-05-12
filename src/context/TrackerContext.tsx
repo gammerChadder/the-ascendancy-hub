@@ -1,18 +1,24 @@
+
 import React, { createContext, useContext, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
-import { LearningItem, Resource, Task, Project, Internship, Content, GymLife, ScrumBoardItem } from "@/types";
+import { 
+  LearningItem, 
+  Resource, 
+  Task, 
+  Project, 
+  ProjectTask,
+  Internship, 
+  InternshipTask,
+  InternshipUpdate,
+  Content, 
+  GymLife, 
+  ScrumCard,
+  ContentIdea,
+  TrackerData
+} from "@/types";
 
 interface TrackerContextType {
-  data: {
-    learning: LearningItem[];
-    dailyTasks: Task[];
-    longTermPlans: Task[];
-    projects: Project[];
-    internships: Internship[];
-    content: Content[];
-    gymLife: GymLife[];
-    scrumBoard: ScrumBoardItem[];
-  };
+  data: TrackerData;
   addLearningItem: (item: Omit<LearningItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateLearningItem: (id: string, updates: Partial<LearningItem>) => void;
   deleteLearningItem: (id: string) => void;
@@ -21,24 +27,38 @@ interface TrackerContextType {
   addTask: (section: "dailyTasks" | "longTermPlans", task: Omit<Task, 'id'>) => void;
   updateTask: (section: "dailyTasks" | "longTermPlans", id: string, updates: Partial<Task>) => void;
   deleteTask: (section: "dailyTasks" | "longTermPlans", id: string) => void;
-  addProject: (project: Omit<Project, 'id'>) => void;
-  updateProject: (id: string, updates: Partial<Project>) => void;
+  addProject: (project: Omit<Project, 'id' | 'tasks' | 'resources'>) => void;
+  updateProject: (id: string, updates: Partial<Omit<Project, 'tasks' | 'resources'>>) => void;
   deleteProject: (id: string) => void;
+  addProjectTask: (projectId: string, task: Omit<ProjectTask, 'id'>) => void;
+  updateProjectTask: (projectId: string, taskId: string, updates: Partial<ProjectTask>) => void;
+  deleteProjectTask: (projectId: string, taskId: string) => void;
+  addProjectResource: (projectId: string, resource: Omit<Resource, 'id'>) => void;
+  deleteProjectResource: (projectId: string, resourceId: string) => void;
   addInternship: (internship: Omit<Internship, 'id'>) => void;
   updateInternship: (id: string, updates: Partial<Internship>) => void;
   deleteInternship: (id: string) => void;
-    addContent: (content: Omit<Content, 'id'>) => void;
+  addInternshipTask: (task: Omit<InternshipTask, 'id'>) => void;
+  updateInternshipTask: (id: string, updates: Partial<InternshipTask>) => void;
+  deleteInternshipTask: (id: string) => void;
+  addInternshipUpdate: (update: Omit<InternshipUpdate, 'id'>) => void;
+  updateInternshipUpdate: (id: string, updates: Partial<InternshipUpdate>) => void;
+  deleteInternshipUpdate: (id: string) => void;
+  addContent: (content: Omit<Content, 'id'>) => void;
   updateContent: (id: string, updates: Partial<Content>) => void;
   deleteContent: (id: string) => void;
-  addGymLife: (gymLife: Omit<GymLife, 'id'>) => void;
+  addContentIdea: (idea: Omit<ContentIdea, 'id'>) => void;
+  updateContentIdea: (id: string, updates: Partial<ContentIdea>) => void;
+  deleteContentIdea: (id: string) => void;
+  addGymEntry: (entry: Omit<GymLife, 'id' | 'workout' | 'type' | 'createdAt' | 'updatedAt'>) => void;
   updateGymLife: (id: string, updates: Partial<GymLife>) => void;
-  deleteGymLife: (id: string) => void;
-  addScrumBoardItem: (item: Omit<ScrumBoardItem, 'id'>) => void;
-  updateScrumBoardItem: (id: string, updates: Partial<ScrumBoardItem>) => void;
-  deleteScrumBoardItem: (id: string) => void;
+  deleteGymEntry: (id: string) => void;
+  addScrumCard: (card: Omit<ScrumCard, 'id' | 'createdAt'>) => void;
+  updateScrumCardStatus: (id: string, status: 'todo' | 'inProgress' | 'done') => void;
+  deleteScrumCard: (id: string) => void;
 }
 
-const initialData = {
+const initialData: TrackerData = {
   learning: [
     {
       id: uuidv4(),
@@ -94,8 +114,13 @@ const initialData = {
   projects: [],
   internships: [],
   content: [],
+  contentCreation: [],
   gymLife: [],
   scrumBoard: [],
+  internship: {
+    todos: [],
+    updates: []
+  }
 };
 
 const TrackerContext = createContext<TrackerContextType>({
@@ -111,18 +136,32 @@ const TrackerContext = createContext<TrackerContextType>({
   addProject: () => {},
   updateProject: () => {},
   deleteProject: () => {},
+  addProjectTask: () => {},
+  updateProjectTask: () => {},
+  deleteProjectTask: () => {},
+  addProjectResource: () => {},
+  deleteProjectResource: () => {},
   addInternship: () => {},
   updateInternship: () => {},
   deleteInternship: () => {},
+  addInternshipTask: () => {},
+  updateInternshipTask: () => {},
+  deleteInternshipTask: () => {},
+  addInternshipUpdate: () => {},
+  updateInternshipUpdate: () => {},
+  deleteInternshipUpdate: () => {},
   addContent: () => {},
   updateContent: () => {},
   deleteContent: () => {},
-  addGymLife: () => {},
+  addContentIdea: () => {},
+  updateContentIdea: () => {},
+  deleteContentIdea: () => {},
+  addGymEntry: () => {},
   updateGymLife: () => {},
-  deleteGymLife: () => {},
-  addScrumBoardItem: () => {},
-  updateScrumBoardItem: () => {},
-  deleteScrumBoardItem: () => {},
+  deleteGymEntry: () => {},
+  addScrumCard: () => {},
+  updateScrumCardStatus: () => {},
+  deleteScrumCard: () => {},
 });
 
 export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -194,12 +233,18 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setData(prev => ({ ...prev, [section]: prev[section].filter(task => task.id !== id) }));
   };
 
-  const addProject = (project: Omit<Project, 'id'>) => {
-    const newProject: Project = { id: uuidv4(), ...project };
+  const addProject = (project: Omit<Project, 'id' | 'tasks' | 'resources'>) => {
+    const newProject: Project = { 
+      id: uuidv4(), 
+      ...project,
+      tasks: [],
+      resources: [],
+      progress: project.progress || 0
+    };
     setData(prev => ({ ...prev, projects: [...prev.projects, newProject] }));
   };
 
-  const updateProject = (id: string, updates: Partial<Project>) => {
+  const updateProject = (id: string, updates: Partial<Omit<Project, 'tasks' | 'resources'>>) => {
     setData(prev => ({
       ...prev,
       projects: prev.projects.map(project =>
@@ -210,6 +255,68 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteProject = (id: string) => {
     setData(prev => ({ ...prev, projects: prev.projects.filter(project => project.id !== id) }));
+  };
+
+  const addProjectTask = (projectId: string, task: Omit<ProjectTask, 'id'>) => {
+    const newTask: ProjectTask = { id: uuidv4(), ...task };
+    setData(prev => ({
+      ...prev,
+      projects: prev.projects.map(project =>
+        project.id === projectId
+          ? { ...project, tasks: [...project.tasks, newTask] }
+          : project
+      ),
+    }));
+  };
+
+  const updateProjectTask = (projectId: string, taskId: string, updates: Partial<ProjectTask>) => {
+    setData(prev => ({
+      ...prev,
+      projects: prev.projects.map(project =>
+        project.id === projectId
+          ? {
+              ...project,
+              tasks: project.tasks.map(task =>
+                task.id === taskId ? { ...task, ...updates } : task
+              ),
+            }
+          : project
+      ),
+    }));
+  };
+
+  const deleteProjectTask = (projectId: string, taskId: string) => {
+    setData(prev => ({
+      ...prev,
+      projects: prev.projects.map(project =>
+        project.id === projectId
+          ? { ...project, tasks: project.tasks.filter(task => task.id !== taskId) }
+          : project
+      ),
+    }));
+  };
+
+  const addProjectResource = (projectId: string, resource: Omit<Resource, 'id'>) => {
+    const newResource: Resource = { id: uuidv4(), ...resource };
+    setData(prev => ({
+      ...prev,
+      projects: prev.projects.map(project =>
+        project.id === projectId
+          ? { ...project, resources: [...project.resources, newResource] }
+          : project
+      ),
+    }));
+  };
+
+  const deleteProjectResource = (projectId: string, resourceId: string) => {
+    setData(prev => ({
+      ...prev,
+      projects: prev.projects.map(project =>
+        project.id === projectId
+          ? { ...project, resources: project.resources.filter(r => r.id !== resourceId) }
+          : project
+      ),
+    }));
   };
 
   const addInternship = (internship: Omit<Internship, 'id'>) => {
@@ -230,7 +337,73 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setData(prev => ({ ...prev, internships: prev.internships.filter(internship => internship.id !== id) }));
   };
 
-    const addContent = (content: Omit<Content, 'id'>) => {
+  const addInternshipTask = (task: Omit<InternshipTask, 'id'>) => {
+    const newTask: InternshipTask = { id: uuidv4(), ...task };
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        todos: [...prev.internship.todos, newTask]
+      }
+    }));
+  };
+
+  const updateInternshipTask = (id: string, updates: Partial<InternshipTask>) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        todos: prev.internship.todos.map(task =>
+          task.id === id ? { ...task, ...updates } : task
+        )
+      }
+    }));
+  };
+
+  const deleteInternshipTask = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        todos: prev.internship.todos.filter(task => task.id !== id)
+      }
+    }));
+  };
+
+  const addInternshipUpdate = (update: Omit<InternshipUpdate, 'id'>) => {
+    const newUpdate: InternshipUpdate = { id: uuidv4(), ...update };
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        updates: [...prev.internship.updates, newUpdate]
+      }
+    }));
+  };
+
+  const updateInternshipUpdate = (id: string, updates: Partial<InternshipUpdate>) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        updates: prev.internship.updates.map(update =>
+          update.id === id ? { ...update, ...updates } : update
+        )
+      }
+    }));
+  };
+
+  const deleteInternshipUpdate = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        updates: prev.internship.updates.filter(update => update.id !== id)
+      }
+    }));
+  };
+
+  const addContent = (content: Omit<Content, 'id'>) => {
     const newContent: Content = { id: uuidv4(), ...content };
     setData(prev => ({ ...prev, content: [...prev.content, newContent] }));
   };
@@ -248,40 +421,69 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setData(prev => ({ ...prev, content: prev.content.filter(content => content.id !== id) }));
   };
 
-    const addGymLife = (gymLife: Omit<GymLife, 'id'>) => {
-    const newGymLife: GymLife = { id: uuidv4(), ...gymLife };
-    setData(prev => ({ ...prev, gymLife: [...prev.gymLife, newGymLife] }));
+  const addContentIdea = (idea: Omit<ContentIdea, 'id'>) => {
+    const newIdea: ContentIdea = { id: uuidv4(), ...idea };
+    setData(prev => ({ ...prev, contentCreation: [...prev.contentCreation, newIdea] }));
+  };
+
+  const updateContentIdea = (id: string, updates: Partial<ContentIdea>) => {
+    setData(prev => ({
+      ...prev,
+      contentCreation: prev.contentCreation.map(idea =>
+        idea.id === id ? { ...idea, ...updates } : idea
+      ),
+    }));
+  };
+
+  const deleteContentIdea = (id: string) => {
+    setData(prev => ({ ...prev, contentCreation: prev.contentCreation.filter(idea => idea.id !== id) }));
+  };
+
+  const addGymEntry = (entry: Omit<GymLife, 'id' | 'workout' | 'type' | 'createdAt' | 'updatedAt'>) => {
+    const newEntry: GymLife = { 
+      id: uuidv4(),
+      workout: entry.activity,
+      type: 'other',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ...entry
+    };
+    setData(prev => ({ ...prev, gymLife: [...prev.gymLife, newEntry] }));
   };
 
   const updateGymLife = (id: string, updates: Partial<GymLife>) => {
     setData(prev => ({
       ...prev,
-      gymLife: prev.gymLife.map(gymLife =>
-        gymLife.id === id ? { ...gymLife, ...updates } : gymLife
+      gymLife: prev.gymLife.map(entry =>
+        entry.id === id ? { ...entry, ...updates, updatedAt: new Date().toISOString() } : entry
       ),
     }));
   };
 
-  const deleteGymLife = (id: string) => {
-    setData(prev => ({ ...prev, gymLife: prev.gymLife.filter(gymLife => gymLife.id !== id) }));
+  const deleteGymEntry = (id: string) => {
+    setData(prev => ({ ...prev, gymLife: prev.gymLife.filter(entry => entry.id !== id) }));
   };
 
-  const addScrumBoardItem = (item: Omit<ScrumBoardItem, 'id'>) => {
-    const newItem: ScrumBoardItem = { id: uuidv4(), ...item };
-    setData(prev => ({ ...prev, scrumBoard: [...prev.scrumBoard, newItem] }));
+  const addScrumCard = (card: Omit<ScrumCard, 'id' | 'createdAt'>) => {
+    const newCard: ScrumCard = { 
+      id: uuidv4(),
+      createdAt: new Date().toISOString(),
+      ...card
+    };
+    setData(prev => ({ ...prev, scrumBoard: [...prev.scrumBoard, newCard] }));
   };
 
-  const updateScrumBoardItem = (id: string, updates: Partial<ScrumBoardItem>) => {
+  const updateScrumCardStatus = (id: string, status: 'todo' | 'inProgress' | 'done') => {
     setData(prev => ({
       ...prev,
-      scrumBoard: prev.scrumBoard.map(item =>
-        item.id === id ? { ...item, ...updates } : item
+      scrumBoard: prev.scrumBoard.map(card =>
+        card.id === id ? { ...card, status } : card
       ),
     }));
   };
 
-  const deleteScrumBoardItem = (id: string) => {
-    setData(prev => ({ ...prev, scrumBoard: prev.scrumBoard.filter(item => item.id !== id) }));
+  const deleteScrumCard = (id: string) => {
+    setData(prev => ({ ...prev, scrumBoard: prev.scrumBoard.filter(card => card.id !== id) }));
   };
 
   return (
@@ -299,18 +501,32 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addProject,
         updateProject,
         deleteProject,
+        addProjectTask,
+        updateProjectTask,
+        deleteProjectTask,
+        addProjectResource,
+        deleteProjectResource,
         addInternship,
         updateInternship,
         deleteInternship,
+        addInternshipTask,
+        updateInternshipTask,
+        deleteInternshipTask,
+        addInternshipUpdate,
+        updateInternshipUpdate,
+        deleteInternshipUpdate,
         addContent,
         updateContent,
         deleteContent,
-        addGymLife,
+        addContentIdea,
+        updateContentIdea,
+        deleteContentIdea,
+        addGymEntry,
         updateGymLife,
-        deleteGymLife,
-        addScrumBoardItem,
-        updateScrumBoardItem,
-        deleteScrumBoardItem,
+        deleteGymEntry,
+        addScrumCard,
+        updateScrumCardStatus,
+        deleteScrumCard
       }}
     >
       {children}

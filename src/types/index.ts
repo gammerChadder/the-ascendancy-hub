@@ -1,3 +1,4 @@
+
 export interface Resource {
   id: string;
   title: string;
@@ -24,6 +25,16 @@ export interface Project {
   endDate?: string;
   createdAt?: string;
   updatedAt?: string;
+  progress: number;
+  tasks: ProjectTask[];
+  resources: Resource[];
+}
+
+export interface ProjectTask {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
 }
 
 export interface Internship {
@@ -37,6 +48,22 @@ export interface Internship {
   updatedAt?: string;
 }
 
+export interface InternshipTask {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
+}
+
+export interface InternshipUpdate {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  tags: string[];
+  completed: boolean;
+}
+
 export interface Content {
   id: string;
   title: string;
@@ -47,6 +74,14 @@ export interface Content {
   updatedAt?: string;
 }
 
+export interface ContentIdea {
+  id: string;
+  title: string;
+  description?: string;
+  platform?: string;
+  status: 'idea' | 'draft' | 'published';
+}
+
 export interface GymLife {
   id: string;
   workout: string;
@@ -55,6 +90,8 @@ export interface GymLife {
   notes?: string;
   createdAt?: string;
   updatedAt?: string;
+  activity: string;
+  date: string;
 }
 
 export interface ScrumTask {
@@ -65,6 +102,15 @@ export interface ScrumTask {
   priority: 'low' | 'medium' | 'high';
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ScrumCard {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'todo' | 'inProgress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  createdAt?: string;
 }
 
 export interface Note {
@@ -89,6 +135,11 @@ export interface TrackerData {
   projects: Project[];
   internships: Internship[];
   content: Content[];
+  contentCreation: ContentIdea[];
   gymLife: GymLife[];
-  scrumBoard: ScrumTask[];
+  scrumBoard: ScrumCard[];
+  internship: {
+    todos: InternshipTask[];
+    updates: InternshipUpdate[];
+  };
 }
