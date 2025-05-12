@@ -193,13 +193,14 @@ interface TrackerContextType {
   addProjectResource: (projectId: string, resource: Omit<Resource, "id" | "createdAt">) => void;
   deleteProjectResource: (projectId: string, resourceId: string) => void;
   addInternshipUpdate: (update: Omit<InternshipUpdate, "id">) => void;
+  updateInternshipUpdate: (updateId: string, updates: Partial<InternshipUpdate>) => void;
   deleteInternshipUpdate: (updateId: string) => void;
   addContentIdea: (idea: Omit<ContentIdea, "id" | "createdAt">) => void;
   updateContentIdea: (ideaId: string, updates: Partial<ContentIdea>) => void;
   deleteContentIdea: (ideaId: string) => void;
   addGymEntry: (entry: Omit<GymEntry, "id">) => void;
   deleteGymEntry: (entryId: string) => void;
-  // New Scrum Board methods
+  // Scrum Board methods
   addScrumCard: (card: Omit<ScrumCard, "id" | "createdAt">) => void;
   updateScrumCardStatus: (cardId: string, status: ScrumCard["status"]) => void;
   updateScrumCard: (cardId: string, updates: Partial<ScrumCard>) => void;
@@ -499,6 +500,19 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     toast.success("Internship update added");
   };
 
+  const updateInternshipUpdate = (updateId: string, updates: Partial<InternshipUpdate>) => {
+    setData(prev => ({
+      ...prev,
+      internship: {
+        ...prev.internship,
+        updates: prev.internship.updates.map(update => 
+          update.id === updateId ? { ...update, ...updates } : update
+        )
+      }
+    }));
+    toast.success("Internship update modified");
+  };
+
   const deleteInternshipUpdate = (updateId: string) => {
     setData(prev => ({
       ...prev,
@@ -634,13 +648,14 @@ export const TrackerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       addProjectResource,
       deleteProjectResource,
       addInternshipUpdate,
+      updateInternshipUpdate,
       deleteInternshipUpdate,
       addContentIdea,
       updateContentIdea,
       deleteContentIdea,
       addGymEntry,
       deleteGymEntry,
-      // Add new Scrum Board methods to the context
+      // Scrum Board methods
       addScrumCard,
       updateScrumCardStatus,
       updateScrumCard,
