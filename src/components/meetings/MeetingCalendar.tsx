@@ -1,13 +1,13 @@
-
 import React, { useState } from 'react';
 import { Meeting } from '@/types';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
-import { addDays, format, isSameDay, parseISO } from 'date-fns';
+import { format, isSameDay, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import MeetingDialog from './MeetingDialog';
 import { Plus } from 'lucide-react';
+import { DayContent, DayContentProps } from 'react-day-picker';
 
 interface MeetingCalendarProps {
   meetings: Meeting[];
@@ -31,18 +31,13 @@ const MeetingCalendar: React.FC<MeetingCalendarProps> = ({
     });
   };
 
-  // Custom day render to show dots for days with meetings
-  const renderDay = (day: Date, selectedDays: Date[] = [], props: any) => {
-    const hasEvents = hasMeetings(day);
+  // Correctly implemented custom day renderer
+  const renderDay = (props: DayContentProps) => {
+    const hasEvents = props.date ? hasMeetings(props.date) : false;
+    
     return (
-      <div
-        {...props}
-        className={cn(
-          props.className,
-          "relative"
-        )}
-      >
-        {props.children}
+      <div className={cn("relative", hasEvents && "has-events")}>
+        <DayContent {...props} />
         {hasEvents && (
           <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-[3px]">
             <div className="h-1 w-1 rounded-full bg-primary" />
@@ -86,9 +81,19 @@ const MeetingCalendar: React.FC<MeetingCalendarProps> = ({
         <Calendar 
           mode="single" 
           selected={selectedDate} 
-          onSelect={setSelectedDate} 
+          onSelect={setSelectedDate}
           className="rounded-md border border-gray-200 dark:border-gray-700 p-3 pointer-events-auto"
-          components={{ Day: renderDay }}
+          modifiers={{
+            hasMeetings: (date) => hasMeetings(date)
+          }}
+          modifiersStyles={{
+            hasMeetings: {
+              fontWeight: 'bold'
+            }
+          }}
+          components={{
+            DayContent: (props) => renderDay(props)
+          }}
         />
       </Card>
       

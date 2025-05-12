@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTracker } from '@/context/TrackerContext';
 import { Button } from '@/components/ui/button';
@@ -9,14 +8,14 @@ import MeetingCard from '@/components/meetings/MeetingCard';
 import MeetingCalendar from '@/components/meetings/MeetingCalendar';
 import { Meeting } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useMediaQuery } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { format } from 'date-fns';
 
 const MeetingsSection: React.FC = () => {
   const { data, addMeeting, updateMeeting, deleteMeeting, addMeetingActionItem, updateMeetingActionItem, deleteMeetingActionItem } = useTracker();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   
   // Sort meetings by date (newest first)
